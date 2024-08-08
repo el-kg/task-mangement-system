@@ -60,7 +60,7 @@ public class SecurityConfig {
                 .authorizeRequests()
                 .requestMatchers("/api/auth/**").permitAll()
                 // Allow access to Swagger UI and related resources
-                .requestMatchers("/swagger-ui.html", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
+                .requestMatchers("/swagger-ui.html", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**","/swagger-ui/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
