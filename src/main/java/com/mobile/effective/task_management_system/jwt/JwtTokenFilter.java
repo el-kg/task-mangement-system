@@ -4,12 +4,12 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterConfig;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
 
 import java.io.IOException;
 
@@ -18,6 +18,8 @@ import java.io.IOException;
  * This filter checks for the presence and validity of a JWT token in requests and sets the authentication in the security context.
  */
 public class JwtTokenFilter implements Filter {
+
+    private static final Logger logger = LoggerFactory.getLogger(JwtTokenFilter.class);
 
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -37,40 +39,45 @@ public class JwtTokenFilter implements Filter {
 
     /**
      * Filters the incoming request to check for a valid JWT token.
+     * If a valid token is found, it sets the authentication in the security context.
      *
-     * @param request the HTTP request
+     * @param request  the HTTP request
      * @param response the HTTP response
-     * @param chain the filter chain
-     * @throws IOException in case of an input/output error
+     * @param chain    the filter chain
+     * @throws IOException      in case of an input/output error
      * @throws ServletException in case of a servlet error
      */
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+    public void doFilter(jakarta.servlet.ServletRequest request, jakarta.servlet.ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
-        String path = httpRequest.getRequestURI();
+        try {
+            String path = httpRequest.getRequestURI();
 
-        // Логирование для отладки
-        System.out.println("Request URI: " + path);
+            logger.debug("Request URI: {}", path);
 
-        // Пропускаем запросы к Swagger UI и связанным ресурсам
-        if (path.startsWith("/swagger-ui.html") ||
-                path.startsWith("/v3/api-docs/") ||
-                path.startsWith("/swagger-resources/") ||
-                path.startsWith("/webjars/")) {
-            System.out.println("Allowing access to Swagger UI resources");
+            // Skip the requests to Swagger UI and related resources
+            if (path.startsWith("/swagger-ui.html") ||
+                    path.startsWith("/v3/api-docs/") ||
+                    path.startsWith("/swagger-resources/") ||
+                    path.startsWith("/webjars/")) {
+                logger.debug("Allowing access to Swagger UI resources");
+                chain.doFilter(request, response);
+                return;
+            }
+
+            String token = jwtTokenProvider.resolveToken(httpRequest);
+            if (token != null && jwtTokenProvider.validateToken(token)) {
+                Authentication authentication = jwtTokenProvider.getAuthentication(token);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+
             chain.doFilter(request, response);
-            return;
+        } catch (Exception e) {
+            logger.error("Error occurred during JWT authentication filter", e);
+            httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
         }
-
-        String token = jwtTokenProvider.resolveToken(httpRequest);
-        if (token != null && jwtTokenProvider.validateToken(token)) {
-            Authentication authentication = jwtTokenProvider.getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-        }
-
-        chain.doFilter(request, response);
     }
 
     @Override

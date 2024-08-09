@@ -12,10 +12,15 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 /**
- * Security configuration for the application.
- * This class configures the security settings, including authentication and authorization rules,
+ * Security configuration class for the application.
+ * This class configures security settings, including authentication, authorization rules,
  * and integrates the JWT token filter into the security filter chain.
  */
 @Configuration
@@ -25,7 +30,7 @@ public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
 
     /**
-     * Constructor for creating an instance of the SecurityConfig class.
+     * Constructs an instance of SecurityConfig.
      *
      * @param jwtTokenProvider the JWT token provider used for authentication
      */
@@ -45,7 +50,8 @@ public class SecurityConfig {
 
     /**
      * Configures the security filter chain for the application.
-     * Sets up authorization rules, disables CSRF protection, and adds the JWT token filter to the security filter chain.
+     * Sets up authorization rules, disables CSRF protection, and adds the JWT token filter
+     * to the security filter chain before the UsernamePasswordAuthenticationFilter.
      *
      * @param http the HttpSecurity instance used to configure security settings
      * @return the configured SecurityFilterChain
@@ -56,14 +62,14 @@ public class SecurityConfig {
         JwtTokenFilter jwtTokenFilter = new JwtTokenFilter(jwtTokenProvider);
 
         http
-                .csrf().disable()
+                .csrf().disable()  // Disable CSRF protection for simplicity
                 .authorizeRequests()
-                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/auth/**").permitAll()  // Permit all requests to authentication endpoints
                 // Allow access to Swagger UI and related resources
-                .requestMatchers("/swagger-ui.html", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**","/swagger-ui/**").permitAll()
-                .anyRequest().authenticated()
+                .requestMatchers("/swagger-ui.html", "/api/tasks/**", "/api/comments/**", "/api/users/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**", "/swagger-ui/**").permitAll()
+                .anyRequest().authenticated()  // Require authentication for all other requests
                 .and()
-                .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);  // Add JWT filter before standard authentication filter
 
         return http.build();
     }
@@ -78,6 +84,28 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    /**
+     * Configures Cross-Origin Resource Sharing (CORS) settings for the application.
+     * <p>
+     * This bean defines the CORS configuration to allow requests from any origin (`*`),
+     * supports the HTTP methods GET, POST, PUT, and DELETE, and permits headers
+     * `Authorization` and `Content-Type` in requests. It sets up CORS for all URL paths
+     * by registering the configuration with a {@link UrlBasedCorsConfigurationSource}.
+     * </p>
+     *
+     * @return a {@link CorsConfigurationSource} instance that contains the CORS configuration
+     */
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("*")); // Или указать точные домены
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }
 

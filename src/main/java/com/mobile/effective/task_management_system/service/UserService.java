@@ -12,9 +12,9 @@ public interface UserService {
     /**
      * Registers a new user with the given email, password, and name.
      *
-     * @param email the email of the user
+     * @param email    the email of the user
      * @param password the password of the user
-     * @param name the name of the user
+     * @param name     the name of the user
      * @return the registered user
      */
     User registerUser(String email, String password, String name);

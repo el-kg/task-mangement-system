@@ -21,6 +21,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * Constructs a UserServiceImpl with the specified UserRepository and PasswordEncoder.
+     *
+     * @param userRepository  the repository used to perform CRUD operations on User entities
+     * @param passwordEncoder the encoder used to hash user passwords
+     */
     @Autowired
     public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
@@ -30,9 +36,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     /**
      * Registers a new user with the given email, password, and name.
      *
-     * @param email the email of the user
+     * @param email    the email of the user
      * @param password the password of the user
-     * @param name the name of the user
+     * @param name     the name of the user
      * @return the registered user
      */
     @Override
@@ -57,6 +63,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     /**
      * Loads a user by username for Spring Security.
+     * This method is called by the Spring Security framework during authentication.
      *
      * @param username the username of the user
      * @return the user details
@@ -66,6 +73,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + username));
+
+        // Constructs and returns a UserDetails object for authentication
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getEmail())
                 .password(user.getPassword())

@@ -50,7 +50,7 @@ public class TaskServiceImpl implements TaskService {
      * Retrieves tasks by the given assignee ID with pagination.
      *
      * @param assigneeId the ID of the assignee
-     * @param pageable the pagination information
+     * @param pageable   the pagination information
      * @return a page of tasks assigned to the assignee
      */
     @Override
@@ -72,7 +72,7 @@ public class TaskServiceImpl implements TaskService {
     /**
      * Updates an existing task.
      *
-     * @param taskId the ID of the task to update
+     * @param taskId      the ID of the task to update
      * @param taskDetails the new details of the task
      * @return the updated task
      */

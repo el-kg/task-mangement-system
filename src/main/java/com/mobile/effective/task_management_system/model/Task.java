@@ -1,5 +1,7 @@
 package com.mobile.effective.task_management_system.model;
 
+import com.mobile.effective.task_management_system.model.enums.TaskPriority;
+import com.mobile.effective.task_management_system.model.enums.TaskStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -36,18 +38,20 @@ public class Task {
     private String description;
 
     /**
-     * Status of the task, e.g., "pending", "in progress", "completed".
+     * Status of the task.
      */
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    @Schema(description = "Статус задачи", example = "В ожидании")
-    private String status;
+    @Schema(description = "Статус задачи", example = "PENDING")
+    private TaskStatus status;
 
     /**
-     * Priority of the task, e.g., "high", "medium", "low".
+     * Priority of the task.
      */
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    @Schema(description = "Приоритет задачи", example = "Высокий")
-    private String priority;
+    @Schema(description = "Приоритет задачи", example = "HIGH")
+    private TaskPriority priority;
 
     /**
      * The user who created the task.

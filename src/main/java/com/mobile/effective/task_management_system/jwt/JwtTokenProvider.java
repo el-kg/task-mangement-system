@@ -22,6 +22,8 @@ import java.util.Date;
 
 /**
  * Utility class for handling JWT tokens.
+ * This class provides methods to create, validate, and parse JWT tokens,
+ * as well as to extract user details and authentication information from tokens.
  */
 @Component
 public class JwtTokenProvider {
@@ -36,6 +38,11 @@ public class JwtTokenProvider {
 
     private final UserDetailsService userDetailsService;
 
+    /**
+     * Constructs a JwtTokenProvider with the given UserDetailsService.
+     *
+     * @param userDetailsService the UserDetailsService used to load user details
+     */
     public JwtTokenProvider(@Lazy UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }

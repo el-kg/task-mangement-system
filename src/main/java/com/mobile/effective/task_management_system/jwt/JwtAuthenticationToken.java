@@ -8,6 +8,7 @@ import java.util.Collection;
 
 /**
  * Custom implementation of {@link AbstractAuthenticationToken} for JWT-based authentication.
+ * This token holds the user details and authorities granted to the user.
  */
 public class JwtAuthenticationToken extends AbstractAuthenticationToken {
 
@@ -27,18 +28,34 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
 
     /**
      * {@inheritDoc}
+     * Credentials are not used in this implementation as they are provided by the JWT token.
      */
     @Override
     public Object getCredentials() {
-        // Credentials are not used in this implementation as they are provided by the JWT token
         return null;
     }
 
     /**
      * {@inheritDoc}
+     * Returns the user details associated with this authentication token.
+     *
+     * @return the user details
      */
     @Override
     public Object getPrincipal() {
         return userDetails;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        JwtAuthenticationToken that = (JwtAuthenticationToken) obj;
+        return userDetails.equals(that.userDetails);
+    }
+
+    @Override
+    public int hashCode() {
+        return userDetails.hashCode();
     }
 }

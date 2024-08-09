@@ -25,6 +25,11 @@ public class TaskController {
 
     private final TaskService taskService;
 
+    /**
+     * Constructs a TaskController with the specified TaskService.
+     *
+     * @param taskService the task service to use
+     */
     @Autowired
     public TaskController(TaskService taskService) {
         this.taskService = taskService;
@@ -73,7 +78,7 @@ public class TaskController {
      * Retrieves tasks by the given assignee ID with pagination.
      *
      * @param assigneeId the ID of the assignee
-     * @param pageable the pagination information
+     * @param pageable   the pagination information
      * @return a page of tasks assigned to the assignee
      */
     @Operation(summary = "Получает задачи по ID исполнителя", description = "Возвращает список задач, назначенных указанному исполнителю")
@@ -113,7 +118,7 @@ public class TaskController {
     /**
      * Updates an existing task.
      *
-     * @param taskId the ID of the task to update
+     * @param taskId      the ID of the task to update
      * @param taskDetails the new details of the task
      * @return the updated task
      */

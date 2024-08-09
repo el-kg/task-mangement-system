@@ -6,13 +6,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Swagger configuration class.
+ * Configuration class for Swagger API documentation.
+ * This class configures the OpenAPI instance to generate documentation for the Task Management API.
  */
 @Configuration
 public class SwaggerConfig {
 
     /**
      * Creates and configures the OpenAPI bean for Swagger documentation.
+     * The OpenAPI instance provides metadata about the API, such as title, version, and description.
      *
      * @return the OpenAPI instance configured with API information
      */
